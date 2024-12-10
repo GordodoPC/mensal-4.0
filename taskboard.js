@@ -1,10 +1,10 @@
-const API_BOARD_URL = 'https://personal-ga2xwx9j.outsystemscloud.com/TaskBoard_CS/rest/TaskBoard/#/';
+const API_BOARD_URL = 'https://personal-ga2xwx9j.outsystemscloud.com/TaskBoard_CS/rest/TaskBoard/';
 
 // Referências
 document.addEventListener('DOMContentLoaded', () => {
     const board = document.getElementById("board");
     const addColumnButton = document.getElementById("addColumnButton");
-    const dropdownContent = document.getElementById('dropdownContent');
+    const boardDropdown = document.getElementById('boardDropdown');
     const themeToggle = document.getElementById('themeToggle');
     const body = document.body;
 
@@ -24,144 +24,47 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    populateDropdown(); // Chamada inicial para popular o dropdown
+    loadBoards(); // Carrega os boards disponíveis
 
-    // Evento para criar nova coluna
     addColumnButton.addEventListener("click", createColumn);
 
-    async function populateDropdown() {
-        dropdownContent.innerHTML = ''; // Limpa o conteúdo antes de popular
-
+    async function loadBoards() {
         try {
             const response = await fetch(`${API_BOARD_URL}boards`);
-            if (!response.ok) {
-                if (response.status === 422) {
-                    const errorData = await response.json();
-                    alert(errorData.Errors[0] || "Erro inesperado.");
-                } else {
-                    alert("Aconteceu um erro inesperado, tente novamente.");
-                }
-                return;
-            }
+            if (!response.ok) throw new Error('Erro ao carregar boards');
 
             const boards = await response.json();
             console.log("Boards recebidos:", boards);
 
-            boards.forEach((board) => {
-                const linkItem = document.createElement('li');
-                linkItem.textContent = board.Name;
-                linkItem.addEventListener('click', (event) => {
-                    event.preventDefault(); // Previne o comportamento padrão do link
-                    console.log(`Board ID selecionado: ${board.Id}`);
-                    buscarColunas(board.Id); // Passa o ID do board corretamente
-                });
-                dropdownContent.appendChild(linkItem);
+            boards.forEach(board => {
+                const option = document.createElement('option');
+                option.value = board.Id;
+                option.textContent = board.Name;
+                boardDropdown.appendChild(option);
+            });
+
+            boardDropdown.addEventListener('change', () => {
+                if (boardDropdown.value) {
+                    loadColumns(boardDropdown.value);
+                }
             });
         } catch (error) {
-            console.error('Erro ao se conectar com o servidor:', error);
-            alert("Falha ao se conectar com o servidor. Tente novamente mais tarde.");
+            console.error('Erro ao carregar boards:', error);
         }
     }
 
-    async function createColumn() {
-        const columnTitle = prompt("Digite o título da nova coluna:");
-        if (!columnTitle) return;
-
-        // Criar coluna localmente antes de enviar à API
-        const column = document.createElement("div");
-        column.className = "column";
-
-        const title = document.createElement("h3");
-        title.innerText = columnTitle;
-
-        const addTaskButton = document.createElement("button");
-        addTaskButton.innerText = "Nova tarefa";
-        addTaskButton.addEventListener("click", () => createTask(column));
-
-        column.appendChild(title);
-        column.appendChild(addTaskButton);
-        board.appendChild(column);
-
-        // Mover o botão "Nova coluna" para o lado da nova coluna
-        board.appendChild(addColumnButton);
-
-        // Enviar coluna para a API
-        try {
-            const response = await fetch(`${API_BOARD_URL}colunas`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ title: columnTitle })
-            });
-
-            if (!response.ok) {
-                throw new Error(`Erro ao criar coluna: ${response.status}`);
-            }
-
-            const data = await response.json();
-            console.log('Coluna criada:', data);
-        } catch (error) {
-            console.error('Erro ao enviar coluna para a API:', error);
-        }
-    }
-
-    async function createTask(column) {
-        const taskContent = prompt("Digite o conteúdo da nova tarefa:");
-        if (!taskContent) return;
-
-        // Criar tarefa localmente antes de enviar à API
-        const task = document.createElement("div");
-        task.className = "task";
-
-        const content = document.createElement("p");
-        content.innerText = taskContent;
-
-        const deleteButton = document.createElement("button");
-        deleteButton.innerText = "Excluir";
-        deleteButton.addEventListener("click", () => task.remove());
-
-        task.appendChild(content);
-        task.appendChild(deleteButton);
-        column.appendChild(task);
-
-        // Enviar tarefa para a API
-        try {
-            const response = await fetch(`${API_BOARD_URL}tarefas`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ content: taskContent, columnId: column.dataset.id })
-            });
-
-            if (!response.ok) {
-                throw new Error(`Erro ao criar tarefa: ${response.status}`);
-            }
-
-            const data = await response.json();
-            console.log('Tarefa criada:', data);
-        } catch (error) {
-            console.error('Erro ao enviar tarefa para a API:', error);
-        }
-    }
-
-    async function buscarColunas(boardId) {
-        console.log(`Buscando colunas para o board com ID: ${boardId}`);
-
+    async function loadColumns(boardId) {
+        console.log(`Carregando colunas para o board ID: ${boardId}`);
         try {
             const response = await fetch(`${API_BOARD_URL}boards/${boardId}/columns`);
-            if (!response.ok) {
-                throw new Error(`Erro ao buscar colunas: ${response.status}`);
-            }
+            if (!response.ok) throw new Error('Erro ao carregar colunas');
 
             const columns = await response.json();
             console.log("Colunas recebidas:", columns);
 
-            // Limpa o conteúdo atual do board antes de popular
             board.innerHTML = '';
 
-            columns.forEach((columnData) => {
+            columns.forEach(columnData => {
                 const column = document.createElement("div");
                 column.className = "column";
 
@@ -170,13 +73,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const addTaskButton = document.createElement("button");
                 addTaskButton.innerText = "Nova tarefa";
-                addTaskButton.addEventListener("click", () => createTask(column));
+                addTaskButton.addEventListener("click", () => createTask(columnData.Id));
 
                 column.appendChild(title);
                 column.appendChild(addTaskButton);
 
-                // Adiciona tarefas existentes na coluna
-                columnData.Tasks.forEach((taskData) => {
+                columnData.Tasks.forEach(taskData => {
                     const task = document.createElement("div");
                     task.className = "task";
 
@@ -185,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     const deleteButton = document.createElement("button");
                     deleteButton.innerText = "Excluir";
-                    deleteButton.addEventListener("click", () => task.remove());
+                    deleteButton.addEventListener("click", () => deleteTask(taskData.Id, task));
 
                     task.appendChild(content);
                     task.appendChild(deleteButton);
@@ -195,10 +97,70 @@ document.addEventListener('DOMContentLoaded', () => {
                 board.appendChild(column);
             });
 
-            // Reposiciona o botão "Adicionar Coluna" no final
             board.appendChild(addColumnButton);
         } catch (error) {
-            console.error('Erro ao buscar colunas:', error);
+            console.error('Erro ao carregar colunas:', error);
+        }
+    }
+
+    async function createColumn() {
+        const columnTitle = prompt("Digite o título da nova coluna:");
+        if (!columnTitle || !boardDropdown.value) return;
+
+        try {
+            const response = await fetch(`${API_BOARD_URL}columns`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ Name: columnTitle, BoardId: boardDropdown.value })
+            });
+
+            if (!response.ok) throw new Error('Erro ao criar coluna');
+
+            const newColumn = await response.json();
+            console.log("Coluna criada:", newColumn);
+            loadColumns(boardDropdown.value);
+        } catch (error) {
+            console.error('Erro ao criar coluna:', error);
+        }
+    }
+
+    async function createTask(columnId) {
+        const taskContent = prompt("Digite o conteúdo da nova tarefa:");
+        if (!taskContent) return;
+
+        try {
+            const response = await fetch(`${API_BOARD_URL}tasks`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ Content: taskContent, ColumnId: columnId })
+            });
+
+            if (!response.ok) throw new Error('Erro ao criar tarefa');
+
+            const newTask = await response.json();
+            console.log("Tarefa criada:", newTask);
+            loadColumns(boardDropdown.value);
+        } catch (error) {
+            console.error('Erro ao criar tarefa:', error);
+        }
+    }
+
+    async function deleteTask(taskId, taskElement) {
+        try {
+            const response = await fetch(`${API_BOARD_URL}tasks/${taskId}`, {
+                method: 'DELETE'
+            });
+
+            if (!response.ok) throw new Error('Erro ao excluir tarefa');
+
+            console.log("Tarefa excluída:", taskId);
+            taskElement.remove();
+        } catch (error) {
+            console.error('Erro ao excluir tarefa:', error);
         }
     }
 });
