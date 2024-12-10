@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quadro de Tarefas</title>
+    <link rel="stylesheet" href="styles.css">
+    <script defer src="taskboard.js"></script>
+</head>
+<body>
+    <header class="header">
+        <h1 class="header-title">Quadro de Tarefas</h1>
+        <div class="menu">
+            <span id="userEmail" class="user-email"></span>
+            <button id="logout" class="logout-button">Sair</button>
+            <label class="theme-switch">
+                <input type="checkbox" id="themeToggle">
+                <span class="theme-label">Dark</span>
+            </label>
+        </div>
+    </header>
+    <main class="main-container">
+        <div class="board-selector">
+            <label for="boardDropdown">Selecione um board:</label>
+            <ul id="dropdownContent" class="dropdown-content"></ul>
+        </div>
+        <div class="board-container">
+            <button id="addColumnButton" class="add-column-button">Nova Coluna</button>
+            <div id="board" class="board"></div>
+        </div>
+    </main>
+</body>
+</html>
