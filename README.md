@@ -1,8 +1,1 @@
-﻿# projeto-integrador
-Os objetivos desse projeto são: Desenvolver um site institucional para a Unican que promova a visibilidade da organização, ofereça informações transparentes sobre suas atividades e facilite o processo de doação;
-Criar uma página informativa que detalhe a missão, visão e valores da Unican, bem como sua estrutura de funcionamento; 
-Implementar uma seção com atualizações diárias sobre as atividades, eventos e projetos da instituição;
-Integrar uma plataforma segura para doações, garantindo transparência no uso dos recursos;
-Desenvolver um canal interativo para que a comunidade possa participar ativamente, seja como voluntário ou doador.
-    A importância de um site para a Unican é inegável, pois permitirá um alcance maior de potenciais doadores e voluntários. Atualmente, a falta de uma plataforma online de fácil acesso limita a visibilidade e a interação com o público. Este projeto é oportuno, visto que a presença digital é essencial para qualquer instituição nos dias atuais. Além disso, a viabilidade é garantida pela necessidade urgente de uma comunicação mais efetiva com a comunidade, o que trará impactos positivos no número de doações e no envolvimento dos cidadãos.
-    A criação de sites para organizações sem fins lucrativos tem sido amplamente estudada como uma ferramenta eficaz para o aumento de visibilidade e captação de recursos. Estudos indicam que uma presença digital clara e acessível pode aumentar significativamente as doações e a participação da comunidade em projetos beneficentes. Segundo análises de plataformas de doações online, a facilidade de navegação e a segurança são fatores cruciais para o sucesso de campanhas de arrecadação digital. Além disso, a transparência na prestação de contas das doações é um elemento essencial para fortalecer a confiança entre a ONG e seus doadores. Esse projeto seguirá essas diretrizes para garantir um impacto positivo e duradouro.
+
